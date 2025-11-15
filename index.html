@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Nosso Lar</title>
+  <style>
+    :root{
+      --bg:#121212; --panel:#181818; --accent:#1DB954; --muted:#b3b3b3; --glass: rgba(255,255,255,0.03);
+      --max-width:1100px;
+    }
+    *{box-sizing:border-box;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial}
+    body{margin:0;background:linear-gradient(180deg,#0f0f0f 0%, #121212 100%);color:#fff;display:flex;justify-content:center;padding:28px}
+    .app{width:100%;max-width:var(--max-width);display:grid;grid-template-columns:260px 1fr;gap:20px}
+
+    /* sidebar */
+    .sidebar{background:var(--panel);border-radius:12px;padding:18px;height:calc(100vh - 56px);position:sticky;top:28px;display:flex;flex-direction:column}
+    .brand{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+    .logo{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#2ecc71);display:flex;align-items:center;justify-content:center;font-weight:700;color:#061;}
+    .brand h1{font-size:16px;margin:0}
+    .nav{margin-top:8px;display:flex;flex-direction:column;gap:8px}
+    .nav button{background:transparent;border:none;color:var(--muted);text-align:left;padding:10px;border-radius:8px;cursor:pointer}
+    .nav button.active, .nav button:hover{color:#fff;background:var(--glass)}
+
+    /* main content */
+    .main{display:flex;flex-direction:column;gap:18px}
+    .hero{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:18px;border-radius:12px;display:flex;gap:18px;align-items:center}
+    .cover{width:140px;height:140px;border-radius:12px;background:#222;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .cover img{width:100%;height:100%;object-fit:cover}
+    .hero-info h2{margin:0;font-size:20px}
+    .hero-info p{color:var(--muted);margin:6px 0 0}
+
+    /* grid for widgets */
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:18px}
+    .card{background:var(--panel);padding:16px;border-radius:12px}
+
+    /* playlist */
+    .playlist{display:flex;flex-direction:column;gap:10px}
+    .track{display:flex;align-items:center;gap:12px;padding:8px;border-radius:8px;cursor:pointer}
+    .track:hover{background:var(--glass)}
+    .track.active{background:rgba(29,185,84,0.12)}
+    .track .num{width:28px;text-align:center;color:var(--muted)}
+    .track .meta{flex:1}
+    .controls{display:flex;align-items:center;gap:10px;margin-top:10px}
+    .big-btn{width:44px;height:44px;border-radius:50%;background:var(--accent);border:none;color:#061;font-weight:700;cursor:pointer}
+
+    /* photos */
+    .photos{display:flex;flex-direction:column;gap:12px}
+    .carousel{display:flex;gap:10px;overflow:hidden}
+    .carousel img{width:100px;height:100px;object-fit:cover;border-radius:10px;border:2px solid transparent}
+    .carousel img.selected{border-color:var(--accent)}
+    .photo-large{height:220px;border-radius:10px;overflow:hidden}
+    .photo-large img{width:100%;height:100%;object-fit:cover}
+
+    /* contador */
+    .contador{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+    .contador .days{font-size:48px;font-weight:700}
+    .small{font-size:13px;color:var(--muted)}
+
+    /* responsive */
+    @media (max-width:960px){.app{grid-template-columns:1fr;}.sidebar{position:relative;height:auto}.grid{grid-template-columns:1fr}.hero{flex-direction:column;align-items:flex-start}.photo-large{height:180px}}
+
+    /* inputs */
+    .input, input[type='date']{width:100%;padding:10px;border-radius:8px;border:none;background:#0f0f0f;color:#fff}
+    .muted{color:var(--muted)}
+
+    footer{color:var(--muted);font-size:13px;margin-top:12px}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">❤</div>
+        <div>
+          <h1>Nosso Lar</h1>
+          <div class="small">Um espaço só nosso</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <button class="active" data-section="home">Home</button>
+        <button data-section="musicas">Músicas</button>
+        <button data-section="fotos">Fotos</button>
+        <button data-section="contador">Contador</button>
+      </nav>
+      <div style="margin-top:auto">
+        <div class="small"></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="hero card" id="home">
+        <div class="cover"><img id="coverImg" src="sofhy01.jpeg" alt="nos"></div>
+        <div class="hero-info">
+          <h2 id="title">Para você, amor</h2>
+          <p id="subtitle">Um cantinho com nossas músicas, fotos e as lembranças que importam.</p>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="input" id="btnPlayFavorite">Tocar playlist favorita</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="grid">
+        <section class="card" id="musicas">
+          <h3>Músicas que amamos</h3>
+          <div class="playlist" id="playlist"></div>
+          <div class="controls">
+            <button id="prev" title="anterior">⏮</button>
+            <button id="play" class="big-btn">►</button>
+            <button id="next" title="próxima">⏭</button>
+            <div style="flex:1">
+              <input id="progress" type="range" min="0" max="100" value="0" style="width:100%">
+            </div>
+          </div>
+          <audio id="audio" preload="metadata"></audio>
+        </section>
+
+        <aside>
+          <section class="card photos" id="fotos">
+            <h3>Fotos nossas</h3>
+            <div class="photo-large" id="photoLarge"><img src="sofhy01.jpeg" alt="grande"></div>
+            <div class="carousel" id="carousel">
+              <img src="sofhy01.jpeg" data-index="0" class="selected">
+              <img src="sofhy02.jpeg" data-index="1">
+              <img src="sofhy03.jpg" data-index="2">
+            </div>
+            </section>
+
+          <section class="card contador" id="contador">
+            <h3>Contador de dias</h3>
+            <div class="days" id="daysCount">0</div>
+            <div class="muted" id="sinceText">dias desde que começamos</div>
+            <div style="width:100%;margin-top:8px;display:flex;gap:8px">
+              <input type="date" id="startDate">
+              <button id="saveDate">Salvar</button>
+            </div>
+            <div class="small" style="margin-top:8px">Escolha a data do começo do relacionamento (vai salvar no seu navegador).</div>
+          </section>
+        </aside>
+      </div>
+
+      <footer class="card" id="footer">Feito com ❤</footer>
+    </main>
+  </div>
+
+  <script>
+    /* ------------------  Dados a editar localmente ------------------
+       - Coloque suas fotos em images/photo1.jpg, photo2.jpg, photo3.jpg
+       - Coloque arquivos de música em music/song1.mp3 etc. Ou use URLs.
+       - Se abrir direto no navegador (file://) alguns arquivos de áudio podem não carregar por políticas do navegador. Recomendado: abrir via servidor local (ex: Live Server no VSCode) ou hospedar os arquivos.
+    ------------------------------------------------------------------*/
+
+    const tracks = [
+  { title: 'Nossa Música 1', artist: 'EXALTASAMBA', src: './AUDIO/É Você.mp3' },
+  { title: 'Nossa Música 2', artist: 'IVYSON', src: './AUDIO/conexao.mp3' },
+  { title: 'Nossa Música 3', artist: 'SOTAM', src: './AUDIO/Foi assim.mp3' }
+];
+
+    // elementos
+    const playlistEl = document.getElementById('playlist');
+    const audio = document.getElementById('audio');
+    const playBtn = document.getElementById('play');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+    const progress = document.getElementById('progress');
+    const coverImg = document.getElementById('coverImg');
+    const photoLarge = document.getElementById('photoLarge').querySelector('img');
+
+    let current = 0;
+
+    function buildPlaylist(){
+      playlistEl.innerHTML = '';
+      tracks.forEach((t,i)=>{
+        const tr = document.createElement('div');
+        tr.className = 'track'+(i===current? ' active':'');
+        tr.innerHTML = `<div class="num">${i+1}</div><div class="meta"><strong>${t.title}</strong><div class="muted">${t.artist}</div></div><div class="muted" style="width:40px;text-align:right">${formatDurationPlaceholder(t.src)}</div>`
+        tr.addEventListener('click', ()=>{playIndex(i)});
+        playlistEl.appendChild(tr);
+      })
+    }
+
+    function formatDurationPlaceholder(src){return '--:--'}
+
+    function playIndex(i){
+      current = i;
+      audio.src = tracks[current].src;
+      audio.play().catch(()=>{console.log('erro ao tocar; verifique caminho do arquivo ou use servidor local')});
+      updateActive();
+      playBtn.textContent = '❚❚';
+    }
+
+    function updateActive(){
+      document.querySelectorAll('.track').forEach((el,idx)=>{
+        el.classList.toggle('active', idx===current);
+      })
+    }
+
+    playBtn.addEventListener('click', ()=>{
+      if(!audio.src){playIndex(current);return}
+      if(audio.paused) audio.play(); else audio.pause();
+    })
+    prevBtn.addEventListener('click', ()=>{current = (current-1+tracks.length)%tracks.length; playIndex(current)});
+    nextBtn.addEventListener('click', ()=>{current = (current+1)%tracks.length; playIndex(current)});
+
+    audio.addEventListener('play', ()=> playBtn.textContent = '❚❚');
+    audio.addEventListener('pause', ()=> playBtn.textContent = '►');
+    audio.addEventListener('timeupdate', ()=>{
+      if(audio.duration) progress.value = Math.floor((audio.currentTime/audio.duration)*100);
+    })
+    progress.addEventListener('input', ()=>{
+      if(audio.duration) audio.currentTime = audio.duration * (progress.value/100);
+    })
+
+    // handle favorite button
+    document.getElementById('btnPlayFavorite').addEventListener('click', ()=>{playIndex(0)});
+
+    // photos carousel
+    const carousel = document.getElementById('carousel');
+    carousel.addEventListener('click', (e)=>{
+      if(e.target.tagName === 'IMG'){
+        document.querySelectorAll('#carousel img').forEach(img=>img.classList.remove('selected'));
+        e.target.classList.add('selected');
+        photoLarge.src = e.target.src;
+        coverImg.src = e.target.src;
+      }
+    })
+
+    // contador de dias
+    const startDateInput = document.getElementById('startDate');
+    const saveDateBtn = document.getElementById('saveDate');
+    const daysCount = document.getElementById('daysCount');
+
+    function calculateDays(dateStr){
+      if(!dateStr) return 0;
+      const start = new Date(dateStr + 'T00:00:00');
+      const now = new Date();
+      const diff = now - start;
+      return Math.floor(diff / (1000*60*60*24));
+    }
+
+    function loadDate(){
+      const saved = localStorage.getItem('nosso_start_date');
+      if(saved){
+        startDateInput.value = saved;
+        daysCount.textContent = calculateDays(saved);
+      } else {
+        // sugestão: usar uma data padrão (ex: 2020-01-01) mas deixamos em branco
+        daysCount.textContent = '0';
+      }
+    }
+    saveDateBtn.addEventListener('click', ()=>{
+      const v = startDateInput.value;
+      if(!v) return alert('Escolha uma data');
+      localStorage.setItem('nosso_start_date', v);
+      daysCount.textContent = calculateDays(v);
+      alert('Data salva!');
+    })
+
+    // small nav
+    document.querySelectorAll('.nav button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const sec = btn.dataset.section;
+        // hide/show sections
+        ['home','musicas','fotos','contador'].forEach(s=>{
+          const el = document.getElementById(s);
+          if(el) el.style.display = (s===sec? 'block' : 'none');
+        })
+      })
+    })
+
+    // set initial view
+    document.getElementById('musicas').style.display = 'none';
+    document.getElementById('fotos').style.display = 'none';
+    document.getElementById('contador').style.display = 'none';
+
+    // init
+    buildPlaylist();
+    loadDate();
+
+    // helpful tip buttons
+    document.getElementById('btnChangeCover').addEventListener('click', ()=>{
+      alert('Para alterar a capa: troque o arquivo images/photo1.jpg ou edite o atributo src do elemento #coverImg no HTML.');
+    })
+
+    // update counter every hour
+    setInterval(()=>{
+      const saved = localStorage.getItem('nosso_start_date');
+      if(saved) daysCount.textContent = calculateDays(saved);
+    }, 1000*60*60);
+
+  </script>
+</body>
+</html>
